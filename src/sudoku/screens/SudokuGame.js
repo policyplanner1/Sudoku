@@ -99,6 +99,29 @@ const SudokuGame = () => {
       <View style={styles.overlay}>
         <Text style={styles.timer}>Time: {timer}s</Text>
 
+        <View style={styles.themeContainer}>
+          <Text
+            style={styles.themeButton}
+            onPress={() => setSelectedTheme('classic')}
+          >
+            Classic
+          </Text>
+
+          <Text
+            style={styles.themeButton}
+            onPress={() => setSelectedTheme('dark')}
+          >
+            Dark
+          </Text>
+
+          <Text
+            style={styles.themeButton}
+            onPress={() => setSelectedTheme('ocean')}
+          >
+            Ocean
+          </Text>
+        </View>
+
         <SudokuBoard
           board={board}
           fixedBoard={fixedBoard}
@@ -142,6 +165,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#fff',
+  },
+
+  themeContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+
+  themeButton: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+
+    marginHorizontal: 10,
+
+    backgroundColor: 'rgba(255,255,255,0.2)',
+
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+
+    borderRadius: 10,
   },
 });
 
