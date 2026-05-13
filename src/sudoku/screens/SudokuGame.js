@@ -25,8 +25,8 @@ const SudokuGame = () => {
   const currentTheme = THEMES[selectedTheme];
   const [isPaused, setIsPaused] = useState(false);
   const [history, setHistory] = useState([]);
-  const [mistakes, setMistakes] = useState([]);
   const [wrongCells, setWrongCells] = useState([]);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     loadGame();
@@ -176,55 +176,110 @@ const SudokuGame = () => {
       )}
 
       <View style={styles.overlay}>
-        <Text style={styles.timer}>Time: {timer}s</Text>
+        <View style={styles.topBar}>
+          <View style={styles.timerContainer}>
+            <Icon name="clock-outline" size={22} color="#fff" />
 
-        <View style={styles.actionContainer}>
-          {/* Pause / Resume */}
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => setIsPaused(prev => !prev)}
-          >
-            <Icon name={isPaused ? 'play' : 'pause'} size={24} color="#fff" />
-          </TouchableOpacity>
+            <Text style={styles.timer}>
+              {`${String(Math.floor(timer / 60)).padStart(2, '0')}:${String(
+                timer % 60,
+              ).padStart(2, '0')}`}
+            </Text>
+          </View>
 
-          {/* Reset */}
-          <TouchableOpacity style={styles.iconButton} onPress={resetGame}>
-            <Icon name="restart" size={24} color="#fff" />
-          </TouchableOpacity>
+          <View style={styles.topRightActions}>
+            {/* Pause */}
+            <TouchableOpacity
+              style={styles.smallIconButton}
+              onPress={() => setIsPaused(prev => !prev)}
+            >
+              <Icon name={isPaused ? 'play' : 'pause'} size={22} color="#fff" />
+            </TouchableOpacity>
 
-          {/* Undo */}
-          <TouchableOpacity style={styles.iconButton} onPress={undoMove}>
-            <Icon name="undo" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          {/* Erase */}
-          <TouchableOpacity style={styles.iconButton} onPress={eraseCell}>
-            <Icon name="eraser" size={24} color="#fff" />
-          </TouchableOpacity>
+            {/* Menu */}
+            <TouchableOpacity
+              style={styles.smallIconButton}
+              onPress={() => setShowMenu(true)}
+            >
+              <Icon name="menu" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.themeContainer}>
-          <Text
-            style={styles.themeButton}
-            onPress={() => setSelectedTheme('classic')}
-          >
-            Classic
-          </Text>
+        {showMenu && (
+          <>
+            <TouchableOpacity
+              style={styles.menuOverlay}
+              activeOpacity={1}
+              onPress={() => setShowMenu(false)}
+            />
 
-          <Text
-            style={styles.themeButton}
-            onPress={() => setSelectedTheme('dark')}
-          >
-            Dark
-          </Text>
+            <View style={styles.sidebar}>
+              <Text style={styles.sidebarTitle}>Menu</Text>
 
-          <Text
-            style={styles.themeButton}
-            onPress={() => setSelectedTheme('ocean')}
-          >
-            Ocean
-          </Text>
-        </View>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  loadGame();
+                }}
+              >
+                <Icon name="plus-circle-outline" size={22} color="#fff" />
+                <Text style={styles.menuText}>New Game</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  resetGame();
+                }}
+              >
+                <Icon name="restart" size={22} color="#fff" />
+                <Text style={styles.menuText}>Clear Puzzle</Text>
+              </TouchableOpacity>
+
+              <View style={styles.themeSection}>
+                <View style={styles.themeHeader}>
+                  <Icon name="palette-outline" size={22} color="#fff" />
+                  <Text style={styles.menuText}>Theme</Text>
+                </View>
+
+                <View style={styles.themeOptions}>
+                  <TouchableOpacity
+                    style={[
+                      styles.themeChip,
+                      selectedTheme === 'classic' && styles.activeThemeChip,
+                    ]}
+                    onPress={() => setSelectedTheme('classic')}
+                  >
+                    <Text style={styles.themeChipText}>Classic</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.themeChip,
+                      selectedTheme === 'dark' && styles.activeThemeChip,
+                    ]}
+                    onPress={() => setSelectedTheme('dark')}
+                  >
+                    <Text style={styles.themeChipText}>Dark</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.themeChip,
+                      selectedTheme === 'ocean' && styles.activeThemeChip,
+                    ]}
+                    onPress={() => setSelectedTheme('ocean')}
+                  >
+                    <Text style={styles.themeChipText}>Ocean</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </>
+        )}
 
         <SudokuBoard
           board={board}
@@ -234,6 +289,17 @@ const SudokuGame = () => {
           onCellPress={handleCellPress}
         />
 
+        <View style={styles.bottomControls}>
+          <TouchableOpacity style={styles.bottomAction} onPress={undoMove}>
+            <Icon name="undo" size={26} color="#fff" />
+            <Text style={styles.bottomActionText}>Undo</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.bottomAction} onPress={eraseCell}>
+            <Icon name="eraser" size={26} color="#fff" />
+            <Text style={styles.bottomActionText}>Erase</Text>
+          </TouchableOpacity>
+        </View>
         <NumberPad onSelect={handleNumberSelect} />
       </View>
     </ImageBackground>
@@ -352,6 +418,166 @@ const styles = StyleSheet.create({
     borderRadius: 14,
 
     marginHorizontal: 8,
+  },
+  menuOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    zIndex: 100,
+  },
+
+  sidebar: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+
+    width: 260,
+
+    backgroundColor: 'rgba(20,20,20,0.96)',
+
+    paddingTop: 70,
+    paddingHorizontal: 20,
+
+    zIndex: 101,
+  },
+
+  sidebarTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 30,
+  },
+
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    paddingVertical: 16,
+
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+
+  menuText: {
+    color: '#fff',
+    fontSize: 17,
+    marginLeft: 14,
+  },
+
+  topBar: {
+    width: '92%',
+
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+
+    marginTop: 40,
+    marginBottom: 20,
+  },
+
+  timerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  timer: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+
+    marginLeft: 10,
+  },
+
+  topRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  smallIconButton: {
+    width: 48,
+    height: 48,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(255,255,255,0.18)',
+
+    borderRadius: 14,
+
+    marginLeft: 10,
+  },
+
+  bottomControls: {
+    width: '92%',
+
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(255,255,255,0.12)',
+
+    borderRadius: 24,
+
+    paddingVertical: 18,
+
+    marginTop: 25,
+    marginBottom: 20,
+  },
+
+  bottomAction: {
+    alignItems: 'center',
+  },
+
+  bottomActionText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+
+    marginTop: 8,
+  },
+
+  themeSection: {
+    paddingVertical: 20,
+
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+
+  themeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    marginBottom: 16,
+  },
+
+  themeOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+
+  themeChip: {
+    backgroundColor: 'rgba(255,255,255,0.12)',
+
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+
+    borderRadius: 20,
+
+    marginRight: 10,
+    marginBottom: 10,
+  },
+
+  activeThemeChip: {
+    backgroundColor: 'rgba(255,255,255,0.28)',
+  },
+
+  themeChipText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
 
