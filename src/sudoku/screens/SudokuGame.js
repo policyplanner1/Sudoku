@@ -7,7 +7,7 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from 'react-native';
-import { THEMES } from '../themes/backgrounds/themeConfig';
+import { THEMES } from '../themes/themeConfig';
 import SudokuBoard from '../components/SudokuBoard';
 import NumberPad from '../components/NumberPad';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
