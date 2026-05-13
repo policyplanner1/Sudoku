@@ -1,17 +1,8 @@
 import React from 'react';
 
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const SudokuCell = ({
-  value,
-  fixed,
-  onPress,
-  selected,
-}) => {
+const SudokuCell = ({ value, fixed, onPress, selected }) => {
   return (
     <TouchableOpacity
       style={[
@@ -21,9 +12,7 @@ const SudokuCell = ({
       ]}
       onPress={onPress}
     >
-      <Text style={styles.text}>
-        {value !== 0 ? value : ''}
-      </Text>
+      <Text style={styles.text}>{value !== 0 ? value : ''}</Text>
     </TouchableOpacity>
   );
 };
@@ -36,6 +25,7 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
   },
 
   fixedCell: {
@@ -49,6 +39,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#fff',
   },
 });
 
