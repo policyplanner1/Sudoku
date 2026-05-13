@@ -23,6 +23,9 @@ const SudokuGame = () => {
   const [selectedTheme, setSelectedTheme] = useState('ocean');
   const currentTheme = THEMES[selectedTheme];
   const [isPaused, setIsPaused] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [mistakes, setMistakes] = useState([]);
+  const [wrongCells, setWrongCells] = useState([]);
 
   useEffect(() => {
     loadGame();
@@ -63,22 +66,39 @@ const SudokuGame = () => {
     setSelectedCell({ row, col });
   };
 
+  const undoMove = () => {
+    if (history.length === 0) return;
+
+    const previousBoard = history[history.length - 1];
+
+    setBoard(previousBoard);
+
+    setHistory(prev => prev.slice(0, -1));
+  };
+
   const handleNumberSelect = async number => {
     if (!selectedCell) return;
     if (isPaused) return;
 
-    const correctValue = solution[selectedCell.row][selectedCell.col];
+    const { row, col } = selectedCell;
 
-    if (number !== correctValue) {
-      Alert.alert('Wrong Number');
-      return;
-    }
+    const newBoard = board.map(r => [...r]);
 
-    const newBoard = board.map(row => [...row]);
+    setHistory(prev => [...prev, board.map(r => [...r])]);
 
-    newBoard[selectedCell.row][selectedCell.col] = number;
+    newBoard[row][col] = number;
 
     setBoard(newBoard);
+
+    const correctValue = solution[row][col];
+
+    const cellKey = `${row}-${col}`;
+
+    if (number !== correctValue) {
+      setWrongCells(prev => [...prev.filter(c => c !== cellKey), cellKey]);
+    } else {
+      setWrongCells(prev => prev.filter(c => c !== cellKey));
+    }
 
     checkCompletion(newBoard);
   };
@@ -90,7 +110,29 @@ const SudokuGame = () => {
 
     setTimer(0);
 
+    setHistory([]);
+
     setIsPaused(false);
+  };
+
+  const eraseCell = () => {
+    if (!selectedCell) return;
+
+    const { row, col } = selectedCell;
+
+    // Prevent erasing fixed cells
+    if (fixedBoard[row][col] !== 0) return;
+
+    // Save history for undo
+    setHistory(prev => [...prev, board.map(r => [...r])]);
+
+    const newBoard = board.map(r => [...r]);
+
+    newBoard[row][col] = 0;
+
+    setWrongCells(prev => prev.filter(c => c !== `${row}-${col}`));
+
+    setBoard(newBoard);
   };
 
   const checkCompletion = async currentBoard => {
@@ -131,6 +173,7 @@ const SudokuGame = () => {
           <Text style={styles.resumeText}>Tap anywhere to resume</Text>
         </TouchableOpacity>
       )}
+
       <View style={styles.overlay}>
         <Text style={styles.timer}>Time: {timer}s</Text>
 
@@ -144,6 +187,14 @@ const SudokuGame = () => {
 
           <Text style={styles.actionButton} onPress={resetGame}>
             Reset
+          </Text>
+
+          <Text style={styles.actionButton} onPress={undoMove}>
+            Undo
+          </Text>
+
+          <Text style={styles.actionButton} onPress={eraseCell}>
+            Erase
           </Text>
         </View>
 
@@ -174,6 +225,7 @@ const SudokuGame = () => {
           board={board}
           fixedBoard={fixedBoard}
           selectedCell={selectedCell}
+          wrongCells={wrongCells}
           onCellPress={handleCellPress}
         />
 

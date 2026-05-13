@@ -2,7 +2,13 @@ import React from 'react';
 import { View } from 'react-native';
 import SudokuCell from './SudokuCell';
 
-const SudokuBoard = ({ board, fixedBoard, selectedCell, onCellPress }) => {
+const SudokuBoard = ({
+  board,
+  fixedBoard,
+  selectedCell,
+  wrongCells,
+  onCellPress,
+}) => {
   return (
     <View>
       {board.map((row, rowIndex) => (
@@ -12,6 +18,7 @@ const SudokuBoard = ({ board, fixedBoard, selectedCell, onCellPress }) => {
               key={`${rowIndex}-${colIndex}`}
               value={cell}
               fixed={fixedBoard[rowIndex][colIndex] !== 0}
+              wrong={wrongCells.includes(`${rowIndex}-${colIndex}`)}
               selected={
                 selectedCell?.row === rowIndex && selectedCell?.col === colIndex
               }
