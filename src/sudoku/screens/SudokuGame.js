@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Alert, StyleSheet, ImageBackground } from 'react-native';
+import {
+  View,
+  Text,
+  Alert,
+  StyleSheet,
+  ImageBackground,
+  TouchableOpacity,
+} from 'react-native';
 import { THEMES } from '../themes/backgrounds/themeConfig';
 import SudokuBoard from '../components/SudokuBoard';
 import NumberPad from '../components/NumberPad';
@@ -15,18 +22,23 @@ const SudokuGame = () => {
   const [timer, setTimer] = useState(0);
   const [selectedTheme, setSelectedTheme] = useState('ocean');
   const currentTheme = THEMES[selectedTheme];
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     loadGame();
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer(prev => prev + 1);
-    }, 1000);
+    let interval;
+
+    if (!isPaused) {
+      interval = setInterval(() => {
+        setTimer(prev => prev + 1);
+      }, 1000);
+    }
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   const loadGame = async () => {
     try {
@@ -45,6 +57,7 @@ const SudokuGame = () => {
   };
 
   const handleCellPress = (row, col) => {
+    if (isPaused) return;
     if (fixedBoard[row][col] !== 0) return;
 
     setSelectedCell({ row, col });
@@ -52,6 +65,7 @@ const SudokuGame = () => {
 
   const handleNumberSelect = async number => {
     if (!selectedCell) return;
+    if (isPaused) return;
 
     const correctValue = solution[selectedCell.row][selectedCell.col];
 
@@ -67,6 +81,16 @@ const SudokuGame = () => {
     setBoard(newBoard);
 
     checkCompletion(newBoard);
+  };
+
+  const resetGame = () => {
+    setBoard(fixedBoard.map(row => [...row]));
+
+    setSelectedCell(null);
+
+    setTimer(0);
+
+    setIsPaused(false);
   };
 
   const checkCompletion = async currentBoard => {
@@ -96,8 +120,32 @@ const SudokuGame = () => {
       style={styles.background}
       resizeMode="cover"
     >
+      {isPaused && (
+        <TouchableOpacity
+          style={styles.pauseOverlay}
+          activeOpacity={1}
+          onPress={() => setIsPaused(false)}
+        >
+          <Text style={styles.pauseText}>PAUSED</Text>
+
+          <Text style={styles.resumeText}>Tap anywhere to resume</Text>
+        </TouchableOpacity>
+      )}
       <View style={styles.overlay}>
         <Text style={styles.timer}>Time: {timer}s</Text>
+
+        <View style={styles.actionContainer}>
+          <Text
+            style={styles.actionButton}
+            onPress={() => setIsPaused(prev => !prev)}
+          >
+            {isPaused ? 'Resume' : 'Pause'}
+          </Text>
+
+          <Text style={styles.actionButton} onPress={resetGame}>
+            Reset
+          </Text>
+        </View>
 
         <View style={styles.themeContainer}>
           <Text
@@ -185,6 +233,54 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
 
     borderRadius: 10,
+  },
+
+  actionContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+
+  actionButton: {
+    color: '#fff',
+
+    fontSize: 16,
+    fontWeight: 'bold',
+
+    backgroundColor: 'rgba(255,255,255,0.2)',
+
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+
+    borderRadius: 12,
+
+    marginHorizontal: 10,
+  },
+
+  pauseOverlay: {
+    position: 'absolute',
+
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(0,0,0,0.6)',
+
+    zIndex: 999,
+  },
+
+  pauseText: {
+    color: '#fff',
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+  resumeText: {
+    color: '#fff',
+    fontSize: 16,
+    marginTop: 10,
   },
 });
 
