@@ -289,18 +289,11 @@ const SudokuGame = () => {
           onCellPress={handleCellPress}
         />
 
-        <View style={styles.bottomControls}>
-          <TouchableOpacity style={styles.bottomAction} onPress={undoMove}>
-            <Icon name="undo" size={26} color="#fff" />
-            <Text style={styles.bottomActionText}>Undo</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.bottomAction} onPress={eraseCell}>
-            <Icon name="eraser" size={26} color="#fff" />
-            <Text style={styles.bottomActionText}>Erase</Text>
-          </TouchableOpacity>
-        </View>
-        <NumberPad onSelect={handleNumberSelect} />
+        <NumberPad
+          onSelect={handleNumberSelect}
+          onUndo={undoMove}
+          onErase={eraseCell}
+        />
       </View>
     </ImageBackground>
   );
