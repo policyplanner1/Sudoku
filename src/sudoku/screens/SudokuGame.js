@@ -1,18 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  Alert,
-  StyleSheet,
-} from 'react-native';
-
+import { View, Text, Alert, StyleSheet, ImageBackground } from 'react-native';
+import { THEMES } from '../themes/backgrounds/themeConfig';
 import SudokuBoard from '../components/SudokuBoard';
 import NumberPad from '../components/NumberPad';
 
-import {
-  startSudokuGame,
-  completeSudokuGame,
-} from '../services/sudokuApi';
+import { startSudokuGame, completeSudokuGame } from '../services/sudokuApi';
 
 const SudokuGame = () => {
   const [board, setBoard] = useState([]);
@@ -21,6 +13,8 @@ const SudokuGame = () => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [gameId, setGameId] = useState(null);
   const [timer, setTimer] = useState(0);
+  const [selectedTheme, setSelectedTheme] = useState('ocean');
+  const currentTheme = THEMES[selectedTheme];
 
   useEffect(() => {
     loadGame();
@@ -38,13 +32,9 @@ const SudokuGame = () => {
     try {
       const response = await startSudokuGame('easy');
 
-      setBoard(
-        response.board.map(row => [...row]),
-      );
+      setBoard(response.board.map(row => [...row]));
 
-      setFixedBoard(
-        response.board.map(row => [...row]),
-      );
+      setFixedBoard(response.board.map(row => [...row]));
 
       setSolution(response.solution);
 
@@ -63,8 +53,7 @@ const SudokuGame = () => {
   const handleNumberSelect = async number => {
     if (!selectedCell) return;
 
-    const correctValue =
-      solution[selectedCell.row][selectedCell.col];
+    const correctValue = solution[selectedCell.row][selectedCell.col];
 
     if (number !== correctValue) {
       Alert.alert('Wrong Number');
@@ -73,8 +62,7 @@ const SudokuGame = () => {
 
     const newBoard = board.map(row => [...row]);
 
-    newBoard[selectedCell.row][selectedCell.col] =
-      number;
+    newBoard[selectedCell.row][selectedCell.col] = number;
 
     setBoard(newBoard);
 
@@ -82,9 +70,7 @@ const SudokuGame = () => {
   };
 
   const checkCompletion = async currentBoard => {
-    const solved =
-      JSON.stringify(currentBoard) ===
-      JSON.stringify(solution);
+    const solved = JSON.stringify(currentBoard) === JSON.stringify(solution);
 
     if (solved) {
       Alert.alert('Success', 'Sudoku Completed');
@@ -105,20 +91,24 @@ const SudokuGame = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.timer}>
-        Time: {timer}s
-      </Text>
+    <ImageBackground
+      source={currentTheme.background}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay}>
+        <Text style={styles.timer}>Time: {timer}s</Text>
 
-      <SudokuBoard
-        board={board}
-        fixedBoard={fixedBoard}
-        selectedCell={selectedCell}
-        onCellPress={handleCellPress}
-      />
+        <SudokuBoard
+          board={board}
+          fixedBoard={fixedBoard}
+          selectedCell={selectedCell}
+          onCellPress={handleCellPress}
+        />
 
-      <NumberPad onSelect={handleNumberSelect} />
-    </View>
+        <NumberPad onSelect={handleNumberSelect} />
+      </View>
+    </ImageBackground>
   );
 };
 
@@ -127,7 +117,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
 
   loaderContainer: {
@@ -136,10 +126,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  background: {
+    flex: 1,
+  },
+
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+
   timer: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#fff',
   },
 });
 
