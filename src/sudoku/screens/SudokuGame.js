@@ -10,6 +10,7 @@ import {
 import { THEMES } from '../themes/backgrounds/themeConfig';
 import SudokuBoard from '../components/SudokuBoard';
 import NumberPad from '../components/NumberPad';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { startSudokuGame, completeSudokuGame } from '../services/sudokuApi';
 
@@ -178,24 +179,28 @@ const SudokuGame = () => {
         <Text style={styles.timer}>Time: {timer}s</Text>
 
         <View style={styles.actionContainer}>
-          <Text
-            style={styles.actionButton}
+          {/* Pause / Resume */}
+          <TouchableOpacity
+            style={styles.iconButton}
             onPress={() => setIsPaused(prev => !prev)}
           >
-            {isPaused ? 'Resume' : 'Pause'}
-          </Text>
+            <Icon name={isPaused ? 'play' : 'pause'} size={24} color="#fff" />
+          </TouchableOpacity>
 
-          <Text style={styles.actionButton} onPress={resetGame}>
-            Reset
-          </Text>
+          {/* Reset */}
+          <TouchableOpacity style={styles.iconButton} onPress={resetGame}>
+            <Icon name="restart" size={24} color="#fff" />
+          </TouchableOpacity>
 
-          <Text style={styles.actionButton} onPress={undoMove}>
-            Undo
-          </Text>
+          {/* Undo */}
+          <TouchableOpacity style={styles.iconButton} onPress={undoMove}>
+            <Icon name="undo" size={24} color="#fff" />
+          </TouchableOpacity>
 
-          <Text style={styles.actionButton} onPress={eraseCell}>
-            Erase
-          </Text>
+          {/* Erase */}
+          <TouchableOpacity style={styles.iconButton} onPress={eraseCell}>
+            <Icon name="eraser" size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.themeContainer}>
@@ -333,6 +338,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     marginTop: 10,
+  },
+
+  iconButton: {
+    width: 50,
+    height: 50,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(255,255,255,0.2)',
+
+    borderRadius: 14,
+
+    marginHorizontal: 8,
   },
 });
 
