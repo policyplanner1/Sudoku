@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import SudokuGame from './SudokuGame';
 
 const difficulties = ['easy', 'medium', 'hard', 'expert'];
@@ -32,6 +34,10 @@ const HomeScreen = ({ username }) => {
 
   const [startGame, setStartGame] = useState(false);
 
+  const [savedGame, setSavedGame] = useState(null);
+
+  const [resumeMode, setResumeMode] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowWelcome(false);
@@ -40,12 +46,33 @@ const HomeScreen = ({ username }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    checkSavedGame();
+  }, []);
+
+  const checkSavedGame = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('savedSudokuGame');
+
+      if (saved) {
+        setSavedGame(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Start Sudoku Game
   if (startGame) {
     return (
       <SudokuGame
         difficulty={selectedDifficulty}
-        onGoHome={() => setStartGame(false)}
+        savedGame={resumeMode ? savedGame : null}
+        onGoHome={async () => {
+          setStartGame(false);
+
+          await checkSavedGame();
+        }}
       />
     );
   }
@@ -88,13 +115,28 @@ const HomeScreen = ({ username }) => {
       {/* New Game Button */}
       <TouchableOpacity
         style={styles.mainButton}
-        onPress={() => setStartGame(true)}
+        onPress={async () => {
+          await AsyncStorage.removeItem('savedSudokuGame');
+
+          setSavedGame(null);
+
+          setResumeMode(false);
+
+          setStartGame(true);
+        }}
       >
         <Text style={styles.mainButtonText}>New Game</Text>
       </TouchableOpacity>
 
       {/* Resume Button */}
-      <TouchableOpacity style={styles.secondaryButton}>
+      <TouchableOpacity
+        style={[styles.secondaryButton, !savedGame && { opacity: 0.5 }]}
+        disabled={!savedGame}
+        onPress={() => {
+          setResumeMode(true);
+          setStartGame(true);
+        }}
+      >
         <Text style={styles.secondaryButtonText}>Resume</Text>
       </TouchableOpacity>
     </View>

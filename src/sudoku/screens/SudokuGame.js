@@ -11,10 +11,11 @@ import { THEMES } from '../themes/themeConfig';
 import SudokuBoard from '../components/SudokuBoard';
 import NumberPad from '../components/NumberPad';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { startSudokuGame, completeSudokuGame } from '../services/sudokuApi';
 
-const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
+const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
   const [board, setBoard] = useState([]);
   const [solution, setSolution] = useState([]);
   const [fixedBoard, setFixedBoard] = useState([]);
@@ -27,25 +28,45 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
   const [history, setHistory] = useState([]);
   const [wrongCells, setWrongCells] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
+  const activeDifficulty = savedGame?.difficulty || difficulty;
+  const [gameLoaded, setGameLoaded] = useState(false);
 
   useEffect(() => {
-    loadGame();
+    if (savedGame) {
+      setGameId(savedGame.gameId);
+
+      setGameLoaded(true);
+
+      setBoard(savedGame.board);
+
+      setSolution(savedGame.solution);
+
+      setFixedBoard(savedGame.fixedBoard);
+
+      setTimer(savedGame.timer);
+
+      setSelectedTheme(savedGame.selectedTheme || 'ocean');
+
+      setWrongCells(savedGame.wrongCells);
+    } else {
+      loadGame();
+    }
   }, []);
 
   useEffect(() => {
     let interval;
 
-    if (!isPaused) {
+    if (!isPaused && gameLoaded) {
       interval = setInterval(() => {
         setTimer(prev => prev + 1);
       }, 1000);
     }
 
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, gameLoaded]);
 
   const getDifficultyColor = () => {
-    switch (difficulty) {
+    switch (activeDifficulty) {
       case 'easy':
         return '#34c759';
 
@@ -63,9 +84,34 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
     }
   };
 
+  const saveCurrentGame = async () => {
+    try {
+      const gameData = {
+        board,
+        solution,
+        fixedBoard,
+        timer,
+        difficulty,
+        selectedTheme,
+        wrongCells,
+        gameId,
+      };
+
+      await AsyncStorage.setItem('savedSudokuGame', JSON.stringify(gameData));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (board.length > 0) {
+      saveCurrentGame();
+    }
+  }, [board, timer, wrongCells, selectedTheme]);
+
   const loadGame = async () => {
     try {
-      const response = await startSudokuGame(difficulty);
+      const response = await startSudokuGame(activeDifficulty);
 
       setBoard(response.board.map(row => [...row]));
 
@@ -74,6 +120,8 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
       setSolution(response.solution);
 
       setGameId(response.game_id);
+
+      setGameLoaded(true);
     } catch (error) {
       console.log(error);
     }
@@ -165,6 +213,8 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
         game_id: gameId,
         completion_time: timer,
       });
+
+      await AsyncStorage.removeItem('savedSudokuGame');
     }
   };
 
@@ -206,7 +256,7 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
               ]}
             >
               <Text style={styles.difficultyText}>
-                {difficulty.toUpperCase()}
+                {activeDifficulty.toUpperCase()}
               </Text>
             </View>
 
