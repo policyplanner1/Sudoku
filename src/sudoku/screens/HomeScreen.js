@@ -4,7 +4,26 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import SudokuGame from './SudokuGame';
 
-const difficulties = ['easy', 'medium', 'hard'];
+const difficulties = ['easy', 'medium', 'hard', 'expert'];
+
+const getDifficultyColor = level => {
+  switch (level) {
+    case 'easy':
+      return '#34c759';
+
+    case 'medium':
+      return '#007aff';
+
+    case 'hard':
+      return '#ff9500';
+
+    case 'expert':
+      return '#ff3b30';
+
+    default:
+      return '#4f7cff';
+  }
+};
 
 const HomeScreen = ({ username }) => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -54,7 +73,10 @@ const HomeScreen = ({ username }) => {
             style={[
               styles.difficultyButton,
 
-              selectedDifficulty === level && styles.selectedDifficulty,
+              // selectedDifficulty === level && styles.selectedDifficulty,
+              selectedDifficulty === level && {
+                backgroundColor: getDifficultyColor(level),
+              },
             ]}
             onPress={() => setSelectedDifficulty(level)}
           >
