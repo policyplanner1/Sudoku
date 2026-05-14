@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import GameLoader from '../components/GameLoader';
 import {
   View,
   Text,
@@ -255,11 +256,7 @@ const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
   };
 
   if (board.length === 0) {
-    return (
-      <View style={styles.loaderContainer}>
-        <Text>Loading Sudoku...</Text>
-      </View>
-    );
+    return <GameLoader text="Preparing puzzle..." />;
   }
 
   return (

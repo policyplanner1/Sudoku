@@ -4,6 +4,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import GameLoader from '../components/GameLoader';
+
 import SudokuGame from './SudokuGame';
 
 const difficulties = ['easy', 'medium', 'hard', 'expert'];
@@ -38,6 +40,8 @@ const HomeScreen = ({ username }) => {
 
   const [resumeMode, setResumeMode] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowWelcome(false);
@@ -59,8 +63,14 @@ const HomeScreen = ({ username }) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <GameLoader text="Loading profile..." />;
+  }
 
   // Start Sudoku Game
   if (startGame) {
