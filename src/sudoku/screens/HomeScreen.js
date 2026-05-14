@@ -33,6 +33,9 @@ const HomeScreen = ({ username }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.rpBadge}>
+        <Text style={styles.rpBadgeText}>RP Powered</Text>
+      </View>
       {/* Welcome Message */}
       {showWelcome && (
         <View style={styles.welcomeBox}>
@@ -178,6 +181,32 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+
+  rpBadge: {
+    position: 'absolute',
+
+    top: 50,
+    right: 20,
+
+    backgroundColor: 'rgba(255,255,255,0.12)',
+
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+
+    borderRadius: 20,
+
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+
+  rpBadgeText: {
+    color: '#fff',
+
+    fontSize: 12,
+    fontWeight: '700',
+
+    letterSpacing: 1,
   },
 });
 
