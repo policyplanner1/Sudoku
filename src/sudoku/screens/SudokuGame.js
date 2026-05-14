@@ -31,6 +31,7 @@ const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
   const [showMenu, setShowMenu] = useState(false);
   const activeDifficulty = savedGame?.difficulty || difficulty;
   const [gameLoaded, setGameLoaded] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   useEffect(() => {
     if (savedGame) {
@@ -67,21 +68,27 @@ const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
   }, [isPaused, gameLoaded]);
 
   useEffect(() => {
+    // const backAction = () => {
+    //   Alert.alert('Leave Game?', 'Your progress is saved automatically.', [
+    //     {
+    //       text: 'Cancel',
+    //       style: 'cancel',
+    //     },
+    //     {
+    //       text: 'Go Home',
+    //       onPress: () => {
+    //         if (onGoHome) {
+    //           onGoHome();
+    //         }
+    //       },
+    //     },
+    //   ]);
+
+    //   return true;
+    // };
+
     const backAction = () => {
-      Alert.alert('Leave Game?', 'Your progress is saved automatically.', [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Go Home',
-          onPress: () => {
-            if (onGoHome) {
-              onGoHome();
-            }
-          },
-        },
-      ]);
+      setShowExitModal(true);
 
       return true;
     };
@@ -409,6 +416,44 @@ const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
           </>
         )}
 
+        {showExitModal && (
+          <View style={styles.modalOverlay}>
+            <View style={styles.exitModal}>
+              <View style={styles.modalIconContainer}>
+                <Icon name="exit-to-app" size={34} color="#fff" />
+              </View>
+
+              <Text style={styles.exitTitle}>Leave Game?</Text>
+
+              <Text style={styles.exitDescription}>
+                Your progress is automatically saved.
+              </Text>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => setShowExitModal(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.homeButton}
+                  onPress={() => {
+                    setShowExitModal(false);
+
+                    if (onGoHome) {
+                      onGoHome();
+                    }
+                  }}
+                >
+                  <Text style={styles.homeButtonText}>Go Home</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+
         <SudokuBoard
           board={board}
           fixedBoard={fixedBoard}
@@ -721,6 +766,115 @@ const styles = StyleSheet.create({
     fontSize: 13,
 
     letterSpacing: 1,
+  },
+
+  modalOverlay: {
+    position: 'absolute',
+
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(0,0,0,0.55)',
+
+    zIndex: 9999,
+  },
+
+  exitModal: {
+    width: '82%',
+
+    backgroundColor: 'rgba(18,18,18,0.96)',
+
+    borderRadius: 30,
+
+    paddingVertical: 30,
+    paddingHorizontal: 24,
+
+    alignItems: 'center',
+  },
+
+  modalIconContainer: {
+    width: 74,
+    height: 74,
+
+    borderRadius: 37,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(255,255,255,0.12)',
+
+    marginBottom: 22,
+  },
+
+  exitTitle: {
+    color: '#fff',
+
+    fontSize: 26,
+    fontWeight: 'bold',
+
+    marginBottom: 12,
+  },
+
+  exitDescription: {
+    color: 'rgba(255,255,255,0.7)',
+
+    fontSize: 16,
+
+    textAlign: 'center',
+
+    lineHeight: 24,
+
+    marginBottom: 28,
+  },
+
+  modalActions: {
+    width: '100%',
+
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  cancelButton: {
+    width: '47%',
+
+    paddingVertical: 16,
+
+    borderRadius: 18,
+
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+
+  homeButton: {
+    width: '47%',
+
+    paddingVertical: 16,
+
+    borderRadius: 18,
+
+    alignItems: 'center',
+
+    backgroundColor: '#4f7cff',
+  },
+
+  cancelButtonText: {
+    color: '#fff',
+
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  homeButtonText: {
+    color: '#fff',
+
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
 
