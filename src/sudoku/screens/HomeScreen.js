@@ -4,6 +4,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { getLeaderboard } from '../services/sudokuApi';
+
 import GameLoader from '../components/GameLoader';
 
 import SudokuGame from './SudokuGame';
@@ -42,6 +44,10 @@ const HomeScreen = ({ username }) => {
 
   const [loading, setLoading] = useState(true);
 
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  const [userRank, setUserRank] = useState(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowWelcome(false);
@@ -52,7 +58,27 @@ const HomeScreen = ({ username }) => {
 
   useEffect(() => {
     checkSavedGame();
+
+    loadLeaderboard();
   }, []);
+
+  const loadLeaderboard = async () => {
+    try {
+      const response = await getLeaderboard();
+
+      setLeaderboard(response.leaderboard);
+
+      const rank = response.leaderboard.findIndex(
+        item => item.username === username,
+      );
+
+      if (rank !== -1) {
+        setUserRank(rank + 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const checkSavedGame = async () => {
     try {
@@ -76,12 +102,15 @@ const HomeScreen = ({ username }) => {
   if (startGame) {
     return (
       <SudokuGame
+        username={username}
         difficulty={selectedDifficulty}
         savedGame={resumeMode ? savedGame : null}
         onGoHome={async () => {
           setStartGame(false);
 
           await checkSavedGame();
+
+          await loadLeaderboard();
         }}
       />
     );
@@ -90,14 +119,27 @@ const HomeScreen = ({ username }) => {
   return (
     <View style={styles.container}>
       <View style={styles.rpBadge}>
-        <Text style={styles.rpBadgeText}>RP Powered</Text>
+        <Text style={styles.rpBadgeText}>Powered By RP</Text>
       </View>
       {/* Welcome Message */}
-      {showWelcome && (
-        <View style={styles.welcomeBox}>
-          <Text style={styles.welcomeText}>Welcome back, {username}!</Text>
+      <View style={styles.topInfoContainer}>
+        {showWelcome && (
+          <View style={styles.welcomeBox}>
+            <Text style={styles.welcomeText}>Welcome back, {username}!</Text>
+          </View>
+        )}
+
+        <View style={styles.rankContainer}>
+          <Text style={styles.rankText}>🏆 Rank #{userRank || '--'}</Text>
+
+          <Text style={styles.pointsText}>
+            ⭐{' '}
+            {leaderboard.find(item => item.username === username)
+              ?.total_points || 0}{' '}
+            Points
+          </Text>
         </View>
-      )}
+      </View>
 
       {/* Game Logo */}
       <Text style={styles.logo}># Sudoku</Text>
@@ -147,7 +189,12 @@ const HomeScreen = ({ username }) => {
           setStartGame(true);
         }}
       >
-        <Text style={styles.secondaryButtonText}>Resume</Text>
+        <Text style={styles.secondaryButtonText}>Resume Game</Text>
+      </TouchableOpacity>
+
+      {/* Leaderboard */}
+      <TouchableOpacity style={styles.secondaryButton}>
+        <Text style={styles.secondaryButtonText}>Leaderboard</Text>
       </TouchableOpacity>
     </View>
   );
@@ -260,7 +307,7 @@ const styles = StyleSheet.create({
   rpBadge: {
     position: 'absolute',
 
-    top: 50,
+    bottom: 30,
     right: 20,
 
     backgroundColor: 'rgba(255,255,255,0.12)',
@@ -281,6 +328,42 @@ const styles = StyleSheet.create({
     fontWeight: '700',
 
     letterSpacing: 1,
+  },
+
+  rankText: {
+    color: '#fff',
+
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  topInfoContainer: {
+    position: 'absolute',
+
+    top: 50,
+
+    alignItems: 'center',
+  },
+
+  rankContainer: {
+    marginTop: 14,
+
+    backgroundColor: 'rgba(255,255,255,0.08)',
+
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+
+    borderRadius: 16,
+
+    alignItems: 'center',
+  },
+
+  pointsText: {
+    color: 'rgba(255,255,255,0.8)',
+
+    fontSize: 14,
+
+    marginTop: 4,
   },
 });
 

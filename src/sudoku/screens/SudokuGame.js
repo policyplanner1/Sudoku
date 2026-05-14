@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { startSudokuGame, completeSudokuGame } from '../services/sudokuApi';
 
-const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
+const SudokuGame = ({ username, difficulty = 'easy', savedGame, onGoHome }) => {
   const [board, setBoard] = useState([]);
   const [solution, setSolution] = useState([]);
   const [fixedBoard, setFixedBoard] = useState([]);
@@ -249,6 +249,7 @@ const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
       await completeSudokuGame({
         game_id: gameId,
         completion_time: timer,
+        username,
       });
 
       await AsyncStorage.removeItem('savedSudokuGame');
