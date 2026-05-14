@@ -69,7 +69,7 @@ const HomeScreen = ({ username }) => {
       setLeaderboard(response.leaderboard);
 
       const rank = response.leaderboard.findIndex(
-        item => item.username === username,
+        item => item.user_id === userId,
       );
 
       if (rank !== -1) {
