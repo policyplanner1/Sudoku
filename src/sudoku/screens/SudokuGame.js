@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
+  BackHandler,
 } from 'react-native';
 import { THEMES } from '../themes/themeConfig';
 import SudokuBoard from '../components/SudokuBoard';
@@ -64,6 +65,34 @@ const SudokuGame = ({ difficulty = 'easy', savedGame, onGoHome }) => {
 
     return () => clearInterval(interval);
   }, [isPaused, gameLoaded]);
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Leave Game?', 'Your progress is saved automatically.', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Go Home',
+          onPress: () => {
+            if (onGoHome) {
+              onGoHome();
+            }
+          },
+        },
+      ]);
+
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   const getDifficultyColor = () => {
     switch (activeDifficulty) {
