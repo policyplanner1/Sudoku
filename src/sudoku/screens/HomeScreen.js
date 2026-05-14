@@ -1,32 +1,17 @@
-import React, {
-  useEffect,
-  useState,
-} from 'react';
+import React, { useEffect, useState } from 'react';
 
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import SudokuGame from './SudokuGame';
 
-const difficulties = [
-  'easy',
-  'medium',
-  'hard',
-];
+const difficulties = ['easy', 'medium', 'hard'];
 
 const HomeScreen = ({ username }) => {
-  const [showWelcome, setShowWelcome] =
-    useState(true);
+  const [showWelcome, setShowWelcome] = useState(true);
 
-  const [selectedDifficulty, setSelectedDifficulty] =
-    useState('medium');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('medium');
 
-  const [startGame, setStartGame] =
-    useState(false);
+  const [startGame, setStartGame] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -41,6 +26,7 @@ const HomeScreen = ({ username }) => {
     return (
       <SudokuGame
         difficulty={selectedDifficulty}
+        onGoHome={() => setStartGame(false)}
       />
     );
   }
@@ -50,16 +36,12 @@ const HomeScreen = ({ username }) => {
       {/* Welcome Message */}
       {showWelcome && (
         <View style={styles.welcomeBox}>
-          <Text style={styles.welcomeText}>
-            Welcome back, {username}!
-          </Text>
+          <Text style={styles.welcomeText}>Welcome back, {username}!</Text>
         </View>
       )}
 
       {/* Game Logo */}
-      <Text style={styles.logo}>
-        # Sudoku
-      </Text>
+      <Text style={styles.logo}># Sudoku</Text>
 
       {/* Difficulty Selector */}
       <View style={styles.difficultyContainer}>
@@ -69,18 +51,11 @@ const HomeScreen = ({ username }) => {
             style={[
               styles.difficultyButton,
 
-              selectedDifficulty === level &&
-                styles.selectedDifficulty,
+              selectedDifficulty === level && styles.selectedDifficulty,
             ]}
-            onPress={() =>
-              setSelectedDifficulty(level)
-            }
+            onPress={() => setSelectedDifficulty(level)}
           >
-            <Text
-              style={styles.difficultyText}
-            >
-              {level.toUpperCase()}
-            </Text>
+            <Text style={styles.difficultyText}>{level.toUpperCase()}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -90,18 +65,12 @@ const HomeScreen = ({ username }) => {
         style={styles.mainButton}
         onPress={() => setStartGame(true)}
       >
-        <Text style={styles.mainButtonText}>
-          New Game
-        </Text>
+        <Text style={styles.mainButtonText}>New Game</Text>
       </TouchableOpacity>
 
       {/* Resume Button */}
-      <TouchableOpacity
-        style={styles.secondaryButton}
-      >
-        <Text style={styles.secondaryButtonText}>
-          Resume
-        </Text>
+      <TouchableOpacity style={styles.secondaryButton}>
+        <Text style={styles.secondaryButtonText}>Resume</Text>
       </TouchableOpacity>
     </View>
   );
@@ -124,8 +93,7 @@ const styles = StyleSheet.create({
 
     top: 50,
 
-    backgroundColor:
-      'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
 
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -159,8 +127,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 12,
 
-    backgroundColor:
-      'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
 
     marginHorizontal: 8,
   },
@@ -198,8 +165,7 @@ const styles = StyleSheet.create({
     width: '80%',
 
     borderWidth: 1,
-    borderColor:
-      'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.2)',
 
     paddingVertical: 16,
 

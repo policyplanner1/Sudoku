@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { startSudokuGame, completeSudokuGame } from '../services/sudokuApi';
 
-const SudokuGame = () => {
+const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
   const [board, setBoard] = useState([]);
   const [solution, setSolution] = useState([]);
   const [fixedBoard, setFixedBoard] = useState([]);
@@ -216,6 +216,21 @@ const SudokuGame = () => {
 
             <View style={styles.sidebar}>
               <Text style={styles.sidebarTitle}>Menu</Text>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+
+                  if (onGoHome) {
+                    onGoHome();
+                  }
+                }}
+              >
+                <Icon name="home-outline" size={22} color="#fff" />
+
+                <Text style={styles.menuText}>Home</Text>
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.menuItem}
