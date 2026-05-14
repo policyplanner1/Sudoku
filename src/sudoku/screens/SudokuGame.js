@@ -44,9 +44,28 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
     return () => clearInterval(interval);
   }, [isPaused]);
 
+  const getDifficultyColor = () => {
+    switch (difficulty) {
+      case 'easy':
+        return '#34c759';
+
+      case 'medium':
+        return '#007aff';
+
+      case 'hard':
+        return '#ff9500';
+
+      case 'expert':
+        return '#ff3b30';
+
+      default:
+        return '#4f7cff';
+    }
+  };
+
   const loadGame = async () => {
     try {
-      const response = await startSudokuGame('easy');
+      const response = await startSudokuGame(difficulty);
 
       setBoard(response.board.map(row => [...row]));
 
@@ -177,14 +196,29 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
 
       <View style={styles.overlay}>
         <View style={styles.topBar}>
-          <View style={styles.timerContainer}>
-            <Icon name="clock-outline" size={22} color="#fff" />
+          <View style={styles.leftSection}>
+            <View
+              style={[
+                styles.difficultyBadge,
+                {
+                  backgroundColor: getDifficultyColor(),
+                },
+              ]}
+            >
+              <Text style={styles.difficultyText}>
+                {difficulty.toUpperCase()}
+              </Text>
+            </View>
 
-            <Text style={styles.timer}>
-              {`${String(Math.floor(timer / 60)).padStart(2, '0')}:${String(
-                timer % 60,
-              ).padStart(2, '0')}`}
-            </Text>
+            <View style={styles.timerContainer}>
+              <Icon name="clock-outline" size={22} color="#fff" />
+
+              <Text style={styles.timer}>
+                {`${String(Math.floor(timer / 60)).padStart(2, '0')}:${String(
+                  timer % 60,
+                ).padStart(2, '0')}`}
+              </Text>
+            </View>
           </View>
 
           <View style={styles.topRightActions}>
@@ -586,6 +620,28 @@ const styles = StyleSheet.create({
   themeChipText: {
     color: '#fff',
     fontWeight: '600',
+  },
+
+  leftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  difficultyBadge: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+
+    borderRadius: 14,
+
+    marginRight: 14,
+  },
+
+  difficultyText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 13,
+
+    letterSpacing: 1,
   },
 });
 
