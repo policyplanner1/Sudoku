@@ -232,7 +232,7 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
                 <Text style={styles.menuText}>Home</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
                   setShowMenu(false);
@@ -241,7 +241,7 @@ const SudokuGame = ({ difficulty = 'easy', onGoHome }) => {
               >
                 <Icon name="plus-circle-outline" size={22} color="#fff" />
                 <Text style={styles.menuText}>New Game</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <TouchableOpacity
                 style={styles.menuItem}

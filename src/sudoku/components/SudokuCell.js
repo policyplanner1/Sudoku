@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#000',
   },
   wrongCell: {
     backgroundColor: 'rgba(255,0,0,0.6)',
